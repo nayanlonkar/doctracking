@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Registration</title>
+  </head>
+  <body>
+    <p> 
+        <form action="" method="post">
+            username : &nbsp;<input type='text'  name="username"><br>
+            Password : &nbsp;<input type='password' name="password"><br>
+            Confirm <br>Password : &nbsp;<input type='password' name="confirm_password"><br>
+            <input type='submit' value='register' name="submit">
+        </form>
+    </p>
+    {% if error %}
+       <p style="color: red;">{{ error }}</p> 
+    {% endif%}
+    <br>
+    Already have an account ?
+    <strong><a href="{{ url_for('index')}}">Login</a></strong>
+    
+  </body>
+</html>
