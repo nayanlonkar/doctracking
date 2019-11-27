@@ -16,9 +16,17 @@ def index():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        session['username'] = username
-        return redirect(url_for('dashboard'))
+        hash_password = generate_password_hash(password)
+        if (mongo.db.users.find_one({'username': username})):
+            if (username == mongo.db.users.find_one({'username': username})['username']) and (hash_password == mongo.db.users.find_one({'username': username})['password']):
+                session['username'] = username
+                return redirect(url_for('dashboard'))
     return render_template('index.html')
+
+
+@app.route('/login')
+def login():
+    return redirect(url_for('index'))
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -30,12 +38,16 @@ def register():
         confirm_password = request.form['confirm_password']
 
         if (usernameValidation(username) == False):
-            error = "username doesn't meet the criteria"
+            error = "Username doesn't meet the requirements!"
             return render_template('register.html', error=error)
-        if (passwordValidation(password) == False or passwordValidation(confirm_password) == False):
-            error = "username doesn't meet the criteria"
+        elif (passwordValidation(password) == False or passwordValidation(confirm_password) == False):
+            error = "Password doesn't meet the criteria!"
             return render_template('register.html', error=error)
-        return "hello"
+        elif (password != confirm_password):
+            error = "Password doesnot match!"
+            return render_template('register.html', error=error)
+        else:
+            return "user created!"
     return render_template('register.html')
 
 
