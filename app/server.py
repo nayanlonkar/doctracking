@@ -16,9 +16,8 @@ def index():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        hash_password = generate_password_hash(password)
         if (mongo.db.users.find_one({'username': username})):
-            if (username == mongo.db.users.find_one({'username': username})['username']) and check_password_hash(hash_password, mongo.db.users.find_one({'username': username})['password']):
+            if (username == mongo.db.users.find_one({'username': username})['username']) and check_password_hash(mongo.db.users.find_one({'username': username})['password'], password):
                 session['username'] = username
                 return redirect(url_for('dashboard'))
     return render_template('index.html')
@@ -54,7 +53,7 @@ def register():
             hash_password = generate_password_hash(password)
             mongo.db.users.insert_one(
                 {'username': username, 'password': hash_password})
-            return "user successfully created!  <a href='{{url_for('login')}}'>Log In </a> to continue..."
+            return "user successfully created!  <a href='/login' >Log In </a> to continue..."
     return render_template('register.html')
 
 
