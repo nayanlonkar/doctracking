@@ -1,7 +1,7 @@
-from flask import Flask, render_template, url_for, redirect, g
+from flask import Flask, render_template, url_for, redirect
 from flask import request, session
 from flask_pymongo import PyMongo
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from static.python.regrexValidation import usernameValidation, passwordValidation
 
@@ -18,7 +18,7 @@ def index():
         password = request.form['password']
         hash_password = generate_password_hash(password)
         if (mongo.db.users.find_one({'username': username})):
-            if (username == mongo.db.users.find_one({'username': username})['username']) and (hash_password == mongo.db.users.find_one({'username': username})['password']):
+            if (username == mongo.db.users.find_one({'username': username})['username']) and check_password_hash(hash_password, mongo.db.users.find_one({'username': username})['password']):
                 session['username'] = username
                 return redirect(url_for('dashboard'))
     return render_template('index.html')
@@ -37,6 +37,7 @@ def register():
         password = request.form['password']
         confirm_password = request.form['confirm_password']
 
+        # password validation --------------->>>>>>>>>>>>>>>
         if (usernameValidation(username) == False):
             error = "Username doesn't meet the requirements!"
             return render_template('register.html', error=error)
@@ -46,8 +47,14 @@ def register():
         elif (password != confirm_password):
             error = "Password doesnot match!"
             return render_template('register.html', error=error)
+        elif (mongo.db.users.find_one({'username': username})):
+            error = "Username already exists!"
+            return render_template('register.html', error=error)
         else:
-            return "user created!"
+            hash_password = generate_password_hash(password)
+            mongo.db.users.insert_one(
+                {'username': username, 'password': hash_password})
+            return "user successfully created!  <a href='{{url_for('login')}}'>Log In </a> to continue..."
     return render_template('register.html')
 
 
