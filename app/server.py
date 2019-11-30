@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, redirect
 from flask import request, session
 from flask_pymongo import PyMongo
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug import secure_filename
 import os
 from static.python.regrexValidation import usernameValidation, passwordValidation
 
@@ -50,19 +51,30 @@ def register():
             error = "Username already exists!"
             return render_template('register.html', error=error)
         else:
+            userCount = mongo.db.counters.find_one_or_404({})['userCount']
             hash_password = generate_password_hash(password)
             mongo.db.users.insert_one(
-                {'username': username, 'password': hash_password})
+                {'_id': userCount+1, 'username': username, 'password': hash_password})
+            mongo.db.counters.update({}, {"$inc": {'userCount': 1}})
             return "user successfully created!  <a href='/login' >Log In </a> to continue..."
     return render_template('register.html')
 
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
-    if 'username' in session:
-        return "<h2>dashboard</h2>"
-    else:
+    if 'username' not in session:
         return redirect(url_for('index'))
+    if request.method == 'POST':
+        file_obj = request.files['filename']    # file object is created
+        uploads_dir = './static/uploads/'       # files will get stored here
+        doc_number = mongo.db.counters.find_one_or_404({})['fileCount']
+        doc_number += 1
+        doc_number = 'DOC' + str(doc_number)
+        file_obj.save(uploads_dir+doc_number)
+        mongo.db.counters.update({}, {'$inc': {'fileCount': 1}})
+        return "<strong>file is uploaded successfully!</strong>"
+    else:
+        return render_template('dashboard.html')
 
 
 if __name__ == '__main__':
