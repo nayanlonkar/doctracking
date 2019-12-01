@@ -10,12 +10,12 @@
     <div class="topbar"></div>
 
     <div class="sidebar">
-        <a class="#">Hey&nbsp;&nbsp;<strong style="color: blueviolet;">{{user}}</strong></a>
+        <a class="#">Welcome&nbsp;&nbsp;<strong style="color: blueviolet;">{{user}}</strong></a>
         <a class="#active" href="{{ url_for('send') }}">Send</a>
-        <a href="#news">Received</a>
-        <a href="#contact">Contact</a>
-        <a href="#about">About</a>
-        <a class="#logout" href="/logout">Logout</a>
+        <a href="#news" href="#received">Received</a>
+        <a href="#contact" href="#track">Track</a>
+        <a href="#about" href="#about">About</a>
+        <a class="#logout" href="{{ url_for('logout')}}">Logout</a>
     </div>
 
     <div class="content">
