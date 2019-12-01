@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug import secure_filename
 import os
 from static.python.regrexValidation import usernameValidation, passwordValidation
+from upload import upload
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(32) or "328eb7fef17d4a099ea990b997ec1405"
@@ -75,13 +76,8 @@ def dashboard():
         return redirect(url_for('index'))
     if request.method == 'POST':
         file_obj = request.files['filename']    # file object is created
-        uploads_dir = './static/uploads/'       # files will get stored here
-        doc_number = mongo.db.counters.find_one_or_404({})['fileCount']
-        doc_number += 1
-        doc_number = 'DOC' + str(doc_number)
-        file_obj.save(uploads_dir+doc_number)
-        mongo.db.counters.update({}, {'$inc': {'fileCount': 1}})
-        return "<strong>file is uploaded successfully!</strong>"
+        result = upload(file_obj, mongo)
+        return result
     else:
         return render_template('dashboard.html')
 
