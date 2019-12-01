@@ -79,7 +79,19 @@ def dashboard():
         result = upload(file_obj, mongo)
         return result
     else:
-        return render_template('dashboard.html', user=session['username'])
+        return render_template('dashboard_base.html', user=session['username'])
+
+
+@app.route('/send', methods=['GET', 'POST'])
+def send():
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    if request.method == 'POST':
+        file_obj = request.files['filename']    # file object is created
+        result = upload(file_obj, mongo)
+        return result
+    else:
+        return render_template('send.html', user=session['username'])
 
 
 if __name__ == '__main__':
