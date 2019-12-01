@@ -79,7 +79,7 @@ def dashboard():
         result = upload(file_obj, mongo)
         return result
     else:
-        return render_template('dashboard.html')
+        return render_template('dashboard.html', user=session['username'])
 
 
 if __name__ == '__main__':
