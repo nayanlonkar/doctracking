@@ -10,7 +10,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(32) or "328eb7fef17d4a099ea990b997ec1405"
 app.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
 mongo = PyMongo(app)
-# hello
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -28,6 +27,15 @@ def index():
 @app.route('/login')
 def login():
     return redirect(url_for('index'))
+
+
+@app.route('/logout')
+def logout():
+    if 'username' in session:
+        session.pop('username', None)
+        return "<strong>You have been logged out!</strong>"
+    else:
+        return "<strong>You're already logged out!</strong>"
 
 
 @app.route('/register', methods=['GET', 'POST'])
