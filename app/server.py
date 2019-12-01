@@ -89,7 +89,7 @@ def send():
     if request.method == 'POST':
         file_obj = request.files['filename']    # file object is created
         result = upload(file_obj, mongo)
-        return result
+        return render_template('send.html', success=result)
     else:
         return render_template('send.html', user=session['username'])
 

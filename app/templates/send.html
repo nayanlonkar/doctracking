@@ -1,8 +1,11 @@
 {% extends "dashboard_base.html" %}
 {% block content %}
+{% if success %}
+<strong>{{ success }}</strong>
+{% else %}
 <form action="{{ url_for('send') }}" method="post" enctype="multipart/form-data">
     <input type='file' name='filename'>
     <input type='submit' value='submit1'>
 </form>
-
+{% endif%}
 {% endblock content %}
