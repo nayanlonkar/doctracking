@@ -85,15 +85,24 @@ def dashboard():
 def send():
     if 'username' not in session:
         return redirect(url_for('index'))
+
     if request.method == 'POST':
         file_obj = request.files['filename']    # file object is created
         uploads_dir = './static/uploads/'       # files will get stored here
+
+        # extract counters from database
         doc_number = mongo.db.counters.find_one_or_404({})['fileCount']
         doc_number += 1
-        doc_number = 'DOC' + str(doc_number)
+
+        # extract file extension from the original filename
+        file_extension = os.path.splitext(file_obj.filename)[1]
+
+        # sequencial file renaming
+        doc_number = 'DOC' + str(int(doc_number)) + file_extension
         file_obj.save(uploads_dir+doc_number)
+
+        # update counters in the database
         mongo.db.counters.update({}, {'$inc': {'fileCount': 1}})
-        # result = upload(file_obj, mongo)
         result = "file is uploaded successfully!"
         return render_template('send.html', user=session['username'], success=result)
     else:

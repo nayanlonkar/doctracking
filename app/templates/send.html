@@ -1,11 +1,17 @@
 {% extends "dashboard_base.html" %}
 {% block content %}
-{% if success %}
-<strong>{{ success }}</strong>
-{% else %}
-<form action="{{ url_for('send') }}" method="post" enctype="multipart/form-data">
-    <input type='file' name='filename'>
-    <input type='submit' value='submit1'>
-</form>
-{% endif%}
+<div class="sendTab">
+    {% if success %}
+    <strong>{{ success }}</strong>
+    {% else %}
+    <div class="form">
+        <form action="{{ url_for('send') }}" method="post" enctype="multipart/form-data">
+            <p><input type="text" name="senderName" placeholder="enter senders username"></p>
+            <p><input type="file" name="filename"></p>
+            <p><textarea rows="4" cols="50" name="dexcription" placeholder="Add a description"></textarea></p>
+            <p><input type="submit" name="submit"></p>
+        </form>
+    </div>
+    {% endif %}
+</div>
 {% endblock content %}
