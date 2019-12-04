@@ -27,3 +27,17 @@ db.fileDetails.insert(
 )
 
 ###########################################################################################
+
+mongo.db.files.insert_one({
+            '_id': doc_number,
+            'filename': doc_name,
+            'owner': session['username'],
+            'description': description,
+            'recipients': {
+                'username': recipient,
+                'datetime': datetime.datetime.now()
+            }
+        }
+        )
+
+###########################################################################################
