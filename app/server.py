@@ -113,9 +113,6 @@ def send():
         file_obj.save(uploads_dir + doc_name)
 
         # file is added into database
-        # mongo.db.files.insert_one({'filename': doc_number, 'owner': session['username'], 'recipients': [
-        #                          {'user': recipient, 'datetime': datetime.datetime.now()}]})
-
         mongo.db.files.insert_one({
             '_id': doc_number,
             'filename': doc_name,
@@ -130,10 +127,21 @@ def send():
 
         # update counters in the database
         mongo.db.counters.update({}, {'$inc': {'fileCount': 1}})
-        result = f"file is uploaded successfully! Document id is {doc_number}"
+        result = f"file is uploaded successfully! Document id is {doc_name}"
         return render_template('send.html', user=session['username'], success=result)
     else:
         return render_template('send.html', user=session['username'])
+
+
+@app.route('/received', methods=['GET', 'POST'])
+def received():
+    if 'username' not in session:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        option = request.form['options']
+    else:
+        return render_template('received.html', user=session['username'])
 
 
 if __name__ == '__main__':

@@ -1,0 +1,14 @@
+{% extends "dashboard_base.html" %}
+{% block content %}
+<div class="receivedTab">
+    <div class="form">
+        <form action="{{ url_for('received') }}" method="post">
+            <input type="radio" name="options" value="1">Check For New Documents &nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="radio" name="options" value="2">Check All Received Documents
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+<hr>
+{% endblock content %}
