@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug import secure_filename
 import os
 from static.python.regrexValidation import usernameValidation, passwordValidation
+import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(32) or "328eb7fef17d4a099ea990b997ec1405"
@@ -73,10 +74,6 @@ def register():
 def dashboard():
     if 'username' not in session:
         return redirect(url_for('index'))
-    if request.method == 'POST':
-        file_obj = request.files['filename']    # file object is created
-        result = upload(file_obj, mongo)
-        return result
     else:
         return render_template('dashboard_base.html', user=session['username'])
 
@@ -87,8 +84,22 @@ def send():
         return redirect(url_for('index'))
 
     if request.method == 'POST':
+        recipient = request.form['recipient']
+        description = request.form['description']
         file_obj = request.files['filename']    # file object is created
         uploads_dir = './static/uploads/'       # files will get stored here
+
+        if (recipient and description and file_obj):
+            pass
+        else:
+            error = "Each field is mandatory"
+            return render_template('send.html', user=session['username'], error=error)
+
+        if (mongo.db.users.find_one({'username': recipient})):
+            pass
+        else:
+            error = "Recipient is unknown"
+            return render_template('send.html', user=session['username'], error=error)
 
         # extract counters from database
         doc_number = mongo.db.counters.find_one_or_404({})['fileCount']
@@ -98,12 +109,28 @@ def send():
         file_extension = os.path.splitext(file_obj.filename)[1]
 
         # sequencial file renaming
-        doc_number = 'DOC' + str(int(doc_number)) + file_extension
-        file_obj.save(uploads_dir+doc_number)
+        doc_name = 'DOC' + str(int(doc_number)) + file_extension
+        file_obj.save(uploads_dir + doc_name)
+
+        # file is added into database
+        # mongo.db.files.insert_one({'filename': doc_number, 'owner': session['username'], 'recipients': [
+        #                          {'user': recipient, 'datetime': datetime.datetime.now()}]})
+
+        mongo.db.files.insert_one({
+            '_id': doc_number,
+            'filename': doc_name,
+            'owner': session['username'],
+            'description': description,
+            'recipients': {
+                'username': recipient,
+                'datetime': datetime.datetime.now()
+            }
+        }
+        )
 
         # update counters in the database
         mongo.db.counters.update({}, {'$inc': {'fileCount': 1}})
-        result = "file is uploaded successfully!"
+        result = f"file is uploaded successfully! Document id is {doc_number}"
         return render_template('send.html', user=session['username'], success=result)
     else:
         return render_template('send.html', user=session['username'])

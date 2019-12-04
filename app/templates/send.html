@@ -6,12 +6,15 @@
     {% else %}
     <div class="form">
         <form action="{{ url_for('send') }}" method="post" enctype="multipart/form-data">
-            <p><input type="text" name="senderName" placeholder="enter senders username"></p>
+            <p><input type="text" name="recipient" placeholder="Enter recipient's username"></p>
             <p><input type="file" name="filename"></p>
-            <p><textarea rows="4" cols="50" name="dexcription" placeholder="Add a description"></textarea></p>
+            <p><textarea rows="4" cols="50" name="description" placeholder="Add a description"></textarea></p>
             <p><input type="submit" name="submit"></p>
         </form>
     </div>
     {% endif %}
+    <p class="error" style="color: red;">
+        {% if error%} {{error}} {% endif%}
+    </p>
 </div>
 {% endblock content %}
