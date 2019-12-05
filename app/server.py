@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, redirect
 from flask import request, session
 from flask_pymongo import PyMongo
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
 import os
 from static.python.regrexValidation import usernameValidation, passwordValidation
 import datetime
@@ -63,9 +63,15 @@ def register():
         else:
             userCount = mongo.db.counters.find_one_or_404({})['userCount']
             hash_password = generate_password_hash(password)
-            mongo.db.users.insert_one(
-                {'_id': userCount+1, 'username': username, 'password': hash_password})
-            mongo.db.counters.update({}, {"$inc": {'userCount': 1}})
+            mongo.db.users.insert_one({
+                '_id': userCount+1,
+                'username': username,
+                'password': hash_password,
+                'files': []
+            })
+
+            mongo.db.counters.update_one({}, {"$inc": {'userCount': 1}})
+
             return "user successfully created!  <a href='/login' >Log In </a> to continue..."
     return render_template('register.html')
 
@@ -112,7 +118,7 @@ def send():
         doc_name = 'DOC' + str(int(doc_number)) + file_extension
         file_obj.save(uploads_dir + doc_name)
 
-        # file is added into database
+        # file is added into 'files' and 'userfiles' collection
         mongo.db.files.insert_one({
             '_id': doc_number,
             'filename': doc_name,
@@ -125,8 +131,15 @@ def send():
         }
         )
 
+        mongo.db.users.update_one(
+            {'username': recipient},
+            {'$addToSet': {'files': {'filename': doc_name, 'status': 0, 'datetime': datetime.datetime.now()}
+                           }
+             }
+        )
+
         # update counters in the database
-        mongo.db.counters.update({}, {'$inc': {'fileCount': 1}})
+        mongo.db.counters.update_one({}, {'$inc': {'fileCount': 1}})
         result = f"file is uploaded successfully! Document id is {doc_name}"
         return render_template('send.html', user=session['username'], success=result)
     else:
@@ -140,6 +153,7 @@ def received():
 
     if request.method == 'POST':
         option = request.form['options']
+        return f"{option}"
     else:
         return render_template('received.html', user=session['username'])
 
