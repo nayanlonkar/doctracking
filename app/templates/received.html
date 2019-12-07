@@ -11,4 +11,44 @@
     </div>
 </div>
 <hr>
+<div class="table">
+    {% if option == 1 %}
+
+    <div>
+        <table style="width: 60%;">
+            <tr>
+                <th>No.</th>
+                <th>Doc Name</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+            </tr>
+
+            {% set count = 1 %}
+            {% for i in cursor%}
+            <tr>
+                <td> {{ count }} </td>
+                <td> {{ i['filename'] }} </td>
+                <td> {{ i['datetime'] }} </td>
+                <td> {{ i['status'] }} </td>
+            </tr>
+            {% set count = count + 1 %}
+            {% endfor %}
+        </table>
+    </div>
+
+
+    {% elif option == 2 %}
+
+    <div>
+        <table style="width: 60%;">
+            <tr>
+                <th>Doc Name</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+            </tr>
+        </table>
+    </div>
+
+    {% endif %}
+</div>
 {% endblock content %}

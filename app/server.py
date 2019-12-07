@@ -152,8 +152,10 @@ def received():
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        option = request.form['options']
-        return f"{option}"
+        option = int(request.form['options'])
+        cursor = mongo.db.users.find_one_or_404(
+            {'username': session['username']})['files']
+        return render_template('received.html', user=session['username'], option=option, cursor=cursor)
     else:
         return render_template('received.html', user=session['username'])
 

@@ -66,3 +66,8 @@ div.content {
 .receivedTab {
   margin-top: 40px;
 }
+
+td {
+  text-align: center;
+  vertical-align: middle;
+}
