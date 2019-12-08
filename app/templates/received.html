@@ -15,23 +15,31 @@
     {% if option == 1 %}
 
     <div>
-        <table style="width: 60%;">
+        <table style="width: 90%;">
             <tr>
                 <th>No.</th>
                 <th>Doc Name</th>
                 <th>Date & Time</th>
+                <th>Description</th>
                 <th>Status</th>
             </tr>
 
             {% set count = 1 %}
             {% for i in cursor%}
+            {% if (i['status'] == 0) %}
             <tr>
                 <td> {{ count }} </td>
                 <td> {{ i['filename'] }} </td>
                 <td> {{ i['datetime'] }} </td>
-                <td> {{ i['status'] }} </td>
+                <td>{{ mongo.db.files.find_one({'filename': i['filename'] })['description'] }}</td>
+                <td>
+                    <a href="{{ url_for('changeStatus', filename = i['filename']) }}">
+                        <button>Receive File</button>
+                    </a>
+                </td>
             </tr>
             {% set count = count + 1 %}
+            {% endif %}
             {% endfor %}
         </table>
     </div>
@@ -40,12 +48,32 @@
     {% elif option == 2 %}
 
     <div>
-        <table style="width: 60%;">
+        <table style="width: 90%;">
             <tr>
+                <th>No.</th>
                 <th>Doc Name</th>
                 <th>Date & Time</th>
+                <th>Description</th>
                 <th>Status</th>
             </tr>
+
+            {% set count = 1 %}
+            {% for i in cursor%}
+            {% if (i['status'] == 1) %}
+            <tr>
+                <td> {{ count }} </td>
+                <td> {{ i['filename'] }} </td>
+                <td> {{ i['datetime'] }} </td>
+                <td>{{ mongo.db.files.find_one({'filename': i['filename'] })['description'] }}</td>
+                <td>
+                    <a href="{{ url_for('download', filename = i['filename']) }}">
+                        <button>Download File</button>
+                    </a>
+                </td>
+            </tr>
+            {% set count = count + 1 %}
+            {% endif %}
+            {% endfor %}
         </table>
     </div>
 

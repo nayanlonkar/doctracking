@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 import os
 from static.python.regrexValidation import usernameValidation, passwordValidation
 import datetime
+from flask import send_from_directory
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(32) or "328eb7fef17d4a099ea990b997ec1405"
@@ -93,7 +94,7 @@ def send():
         recipient = request.form['recipient']
         description = request.form['description']
         file_obj = request.files['filename']    # file object is created
-        uploads_dir = './static/uploads/'       # files will get stored here
+        uploads_dir = '../uploads/'       # files will get stored here
 
         if (recipient and description and file_obj):
             pass
@@ -153,11 +154,49 @@ def received():
 
     if request.method == 'POST':
         option = int(request.form['options'])
-        cursor = mongo.db.users.find_one_or_404(
-            {'username': session['username']})['files']
-        return render_template('received.html', user=session['username'], option=option, cursor=cursor)
+        if (option == 1):
+            cursor = mongo.db.users.find_one_or_404(
+                {'username': session['username'], 'files.status': 0})['files']
+        elif (option == 2):
+            cursor = mongo.db.users.find_one_or_404(
+                {'username': session['username'], 'files.status': 1})['files']
+        else:
+            return "select an option"
+        return render_template('received.html', user=session['username'], option=option, cursor=cursor, mongo=mongo)
     else:
         return render_template('received.html', user=session['username'])
+
+
+@app.route('/changeStatus/<filename>')
+def changeStatus(filename):
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    else:
+        if (filename == ''):
+            return "There is nothing new !"
+        # '$' acts as a positional operator
+        mongo.db.users.update_one(
+            {
+                'username': session['username'],
+                'files.filename': filename
+            },
+            {
+                '$set': {
+                    'files.$.status': 1
+                }
+            }
+        )
+        return "status changed!"
+
+
+@app.route('/download/<filename>')
+def download(filename):
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    else:
+        uploads_dir = '../uploads/'
+        return send_from_directory(directory=uploads_dir, filename=filename)
+    return "Download!"
 
 
 if __name__ == '__main__':
