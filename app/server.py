@@ -125,10 +125,10 @@ def send():
             'filename': doc_name,
             'owner': session['username'],
             'description': description,
-            'recipients': {
+            'recipients': [{
                 'username': recipient,
                 'datetime': datetime.datetime.now()
-            }
+            }]
         }
         )
 
@@ -196,7 +196,49 @@ def download(filename):
     else:
         uploads_dir = '../uploads/'
         return send_from_directory(directory=uploads_dir, filename=filename)
-    return "Download!"
+    return "Error!"
+
+
+@app.route('/forward', methods=['GET', 'POST'])
+def forward():
+    if 'username' not in session:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        filename = request.form['filename']
+        recipient = request.form['recipient']
+        remark = request.form['remark']
+        error = None
+
+        if (filename == ''):
+            error = "Filename shouldn't be empty!"
+            return render_template('forward.html', error=error)
+        elif (remark == ''):
+            error = "Add a remark!"
+            return render_template('forward.html', error=error)
+
+        if (mongo.db.users.find_one({'username': session['username'], 'files.filename': filename})):
+            return "hello"
+        else:
+            error = f"There is no file of name {filename}"
+
+        mongo.db.files.update_one(
+            {'filename': filename},
+            {'$addToSet':
+                {
+                    'recipients': {'username': recipient, 'datetime': datetime.datetime.now()}
+                }
+             }
+        )
+
+        return render_template('forward.html', error=error)
+    else:
+        return render_template('forward.html')
+
+
+@app.route('/track')
+def track():
+    return "track"
 
 
 if __name__ == '__main__':

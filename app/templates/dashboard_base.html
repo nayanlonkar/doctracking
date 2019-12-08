@@ -12,8 +12,9 @@
     <div class="sidebar">
         <a class="#">Welcome&nbsp;&nbsp;<strong style="color: blueviolet;">{{user}}</strong></a>
         <a class="#active" href="{{ url_for('send') }}">Send</a>
-        <a class="#news" href="{{ url_for('received') }}">Received</a>
-        <a class="#contact" href="#track">Track</a>
+        <a class="#receive" href="{{ url_for('received') }}">Receive</a>
+        <a class="#forward" href="{{ url_for('forward') }}">Forward</a>
+        <a class="#track" href="{{ url_for('track') }}">Track</a>
         <a class="#logout" href="{{ url_for('logout')}}">Logout</a>
     </div>
 
