@@ -127,7 +127,8 @@ def send():
             'description': description,
             'recipients': [{
                 'username': recipient,
-                'datetime': datetime.datetime.now()
+                'datetime': datetime.datetime.now(),
+                'remark': description
             }]
         }
         )
@@ -186,7 +187,7 @@ def changeStatus(filename):
                 }
             }
         )
-        return "status changed!"
+        return "file recieved!"
 
 
 @app.route('/download/<filename>')
@@ -212,33 +213,66 @@ def forward():
 
         if (filename == ''):
             error = "Filename shouldn't be empty!"
-            return render_template('forward.html', error=error)
+            return render_template('forward.html', user=session['username'], error=error)
         elif (remark == ''):
             error = "Add a remark!"
-            return render_template('forward.html', error=error)
+            return render_template('forward.html', user=session['username'], error=error)
 
         if (mongo.db.users.find_one({'username': session['username'], 'files.filename': filename})):
-            return "hello"
+            pass
         else:
             error = f"There is no file of name {filename}"
+            return render_template('forward.html', user=session['username'], error=error)
+
+        if (mongo.db.users.find_one({'username': recipient})):
+            pass
+        else:
+            error = f"There is no user {recipient}"
+            return render_template('forward.html', user=session['username'], error=error)
 
         mongo.db.files.update_one(
             {'filename': filename},
             {'$addToSet':
                 {
-                    'recipients': {'username': recipient, 'datetime': datetime.datetime.now()}
+                    'recipients': {'username': recipient, 'datetime': datetime.datetime.now(), 'remark': remark}
                 }
              }
         )
 
-        return render_template('forward.html', error=error)
+        mongo.db.users.update_one(
+            {'username': recipient},
+            {'$addToSet': {'files': {'filename': filename, 'status': 0, 'datetime': datetime.datetime.now()}
+                           }
+             }
+        )
+
+        success = "file forwarded successfully!"
+        return render_template('forward.html', user=session['username'], error=error, success=success)
     else:
-        return render_template('forward.html')
+        return render_template('forward.html', user=session['username'])
 
 
-@app.route('/track')
+@app.route('/track', methods=['GET', 'POST'])
 def track():
-    return "track"
+    if 'username' not in session:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        filename = request.form['filename']
+        error = None
+
+        if (mongo.db.files.find_one({'filename': filename, 'owner': session['username']})):
+            pass
+        else:
+            error = 'Either file does not found or You are not authorised to track this file!'
+            return render_template('track.html', user=session['username'], error=error)
+
+        cursor = mongo.db.files.find_one_or_404(
+            {'filename': filename})['recipients']
+        return render_template('track.html', user=session['username'], cursor=cursor)
+
+    else:
+        return render_template('track.html', user=session['username'])
 
 
 if __name__ == '__main__':

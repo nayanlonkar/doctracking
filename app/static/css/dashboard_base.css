@@ -71,6 +71,10 @@ div.content {
   margin-top: 40px;
 }
 
+table {
+  width: 90%;
+}
+
 td {
   text-align: center;
   vertical-align: middle;

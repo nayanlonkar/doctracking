@@ -1,14 +1,26 @@
 {% extends "dashboard_base.html" %}
 {% block content %}
+
 <div class="forwardTab">
+
+    {% if success %}
+    <strong>{{ success }}</strong>
+
+    {% else %}
+
     <form action="{{ url_for('forward') }}" method="post">
         <p><input type="text" name="filename" placeholder="Enter filename"></p>
+        <p><input type="text" name="recipient" placeholder="Enter recipient's username"></p>
         <p><textarea rows="4" cols="50" name="remark" placeholder="Add a remark"></textarea></p>
         <p><input type="submit" name="submit"></p>
     </form>
+
+    {% endif %}
+
     <p class="error" style="color: red;">
         {% if error%} {{error}} {% endif%}
     </p>
+
 </div>
 
 {% endblock content %}

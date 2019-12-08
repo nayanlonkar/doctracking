@@ -13,9 +13,9 @@
 <hr>
 <div class="table">
     {% if option == 1 %}
-
+    {% set count = 1 %}
     <div>
-        <table style="width: 90%;">
+        <table>
             <tr>
                 <th>No.</th>
                 <th>Doc Name</th>
@@ -24,7 +24,6 @@
                 <th>Status</th>
             </tr>
 
-            {% set count = 1 %}
             {% for i in cursor%}
             {% if (i['status'] == 0) %}
             <tr>
@@ -48,7 +47,7 @@
     {% elif option == 2 %}
 
     <div>
-        <table style="width: 90%;">
+        <table>
             <tr>
                 <th>No.</th>
                 <th>Doc Name</th>
