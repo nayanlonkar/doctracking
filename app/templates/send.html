@@ -8,6 +8,12 @@
         <form action="{{ url_for('send') }}" method="post" enctype="multipart/form-data">
             <p><input type="text" name="recipient" placeholder="Enter recipient's username"></p>
             <p><input type="file" name="filename"></p>
+            <p>
+                <select name="docType">
+                    <option value="notice">Notice</option>
+                    <option value="request">Request</option>
+                </select>
+            </p>
             <p><textarea rows="4" cols="50" name="description" placeholder="Add a description"></textarea></p>
             <p><input type="submit" name="submit"></p>
         </form>

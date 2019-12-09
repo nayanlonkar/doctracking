@@ -4,7 +4,6 @@
 <div class="trackTab">
     {% if success %}
     <strong>{{ success }}</strong>
-
     {% else %}
 
     <form action="{{ url_for('track') }}" method="post">
@@ -15,7 +14,7 @@
     {% endif %}
 
     <p class="error" style="color: red;">
-        {% if error%} {{error}} {% endif%}
+        {% if error %} {{error}} {% endif%}
     </p>
 </div>
 <hr>
@@ -24,6 +23,7 @@
     <table>
         <tr>
             <th>No.</th>
+            <th>Sender</th>
             <th>Recipients</th>
             <th>Date & Time</th>
             <th>Remark</th>
@@ -33,6 +33,7 @@
         {% for i in cursor %}
         <tr>
             <td> {{ count|length }} </td>
+            <td> {{ i['sender'] }} </td>
             <td> {{ i['username'] }} </td>
             <td> {{ i['datetime'] }} </td>
             <td> {{ i['remark'] }} </td>

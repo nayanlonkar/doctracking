@@ -11,6 +11,9 @@
     </div>
 </div>
 <hr>
+{% if error %}
+{{ error }}
+{% else %}
 <div class="table">
     {% if option == 1 %}
     {% set count = 1 %}
@@ -19,6 +22,7 @@
             <tr>
                 <th>No.</th>
                 <th>Doc Name</th>
+                <th>Sender</th>
                 <th>Date & Time</th>
                 <th>Description</th>
                 <th>Status</th>
@@ -29,6 +33,7 @@
             <tr>
                 <td> {{ count }} </td>
                 <td> {{ i['filename'] }} </td>
+                <td> {{ i['sender'] }} </td>
                 <td> {{ i['datetime'] }} </td>
                 <td>{{ mongo.db.files.find_one({'filename': i['filename'] })['description'] }}</td>
                 <td>
@@ -51,6 +56,7 @@
             <tr>
                 <th>No.</th>
                 <th>Doc Name</th>
+                <th>Sender</th>
                 <th>Date & Time</th>
                 <th>Description</th>
                 <th>Status</th>
@@ -62,6 +68,7 @@
             <tr>
                 <td> {{ count }} </td>
                 <td> {{ i['filename'] }} </td>
+                <td> {{ i['sender'] }} </td>
                 <td> {{ i['datetime'] }} </td>
                 <td>{{ mongo.db.files.find_one({'filename': i['filename'] })['description'] }}</td>
                 <td>
@@ -78,4 +85,6 @@
 
     {% endif %}
 </div>
+{% endif %}
+
 {% endblock content %}

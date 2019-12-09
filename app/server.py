@@ -64,6 +64,7 @@ def register():
         else:
             userCount = mongo.db.counters.find_one_or_404({})['userCount']
             hash_password = generate_password_hash(password)
+
             mongo.db.users.insert_one({
                 '_id': userCount+1,
                 'username': username,
@@ -94,6 +95,7 @@ def send():
         recipient = request.form['recipient']
         description = request.form['description']
         file_obj = request.files['filename']    # file object is created
+        docType = request.form['docType']
         uploads_dir = '../uploads/'       # files will get stored here
 
         if (recipient and description and file_obj):
@@ -125,8 +127,10 @@ def send():
             'filename': doc_name,
             'owner': session['username'],
             'description': description,
+            'docType': docType,
             'recipients': [{
                 'username': recipient,
+                'sender': session['username'],
                 'datetime': datetime.datetime.now(),
                 'remark': description
             }]
@@ -135,7 +139,7 @@ def send():
 
         mongo.db.users.update_one(
             {'username': recipient},
-            {'$addToSet': {'files': {'filename': doc_name, 'status': 0, 'datetime': datetime.datetime.now()}
+            {'$addToSet': {'files': {'filename': doc_name, 'sender': session['username'], 'status': 0, 'datetime': datetime.datetime.now()}
                            }
              }
         )
@@ -154,15 +158,29 @@ def received():
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        option = int(request.form['options'])
-        if (option == 1):
-            cursor = mongo.db.users.find_one_or_404(
-                {'username': session['username'], 'files.status': 0})['files']
-        elif (option == 2):
-            cursor = mongo.db.users.find_one_or_404(
-                {'username': session['username'], 'files.status': 1})['files']
+        # option = int(request.form['options'])
+        option = request.form.get('options')
+        if (option == None):
+            return "select an option!"
         else:
-            return "select an option"
+            option = int(option)
+
+        cursor = None
+        if (option == 1):
+            if (mongo.db.users.find_one({'username': session['username'], 'files.status': 0})):
+                cursor = mongo.db.users.find_one(
+                    {'username': session['username'], 'files.status': 0})['files']
+        elif (option == 2):
+            if (mongo.db.users.find_one({'username': session['username'], 'files.status': 1})):
+                cursor = mongo.db.users.find_one(
+                    {'username': session['username'], 'files.status': 1})['files']
+        else:
+            pass
+
+        if (cursor == None):
+            error = "No file found"
+            return render_template('received.html', user=session['username'], error=error, mongo=mongo)
+
         return render_template('received.html', user=session['username'], option=option, cursor=cursor, mongo=mongo)
     else:
         return render_template('received.html', user=session['username'])
@@ -234,14 +252,14 @@ def forward():
             {'filename': filename},
             {'$addToSet':
                 {
-                    'recipients': {'username': recipient, 'datetime': datetime.datetime.now(), 'remark': remark}
+                    'recipients': {'username': recipient, 'sender': session['username'], 'datetime': datetime.datetime.now(), 'remark': remark}
                 }
              }
         )
 
         mongo.db.users.update_one(
             {'username': recipient},
-            {'$addToSet': {'files': {'filename': filename, 'status': 0, 'datetime': datetime.datetime.now()}
+            {'$addToSet': {'files': {'filename': filename, 'sender': session['username'], 'status': 0, 'datetime': datetime.datetime.now()}
                            }
              }
         )
