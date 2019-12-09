@@ -6,10 +6,12 @@
     <strong>{{ success }}</strong>
 
     {% else %}
+
     <form action="{{ url_for('track') }}" method="post">
         <p><input type="text" name="filename" placeholder="Enter filename"></p>
         <p><input type="submit" name="submit"></p>
     </form>
+
     {% endif %}
 
     <p class="error" style="color: red;">
@@ -18,7 +20,7 @@
 </div>
 <hr>
 <div class="table">
-    {% set count = 1 %}
+
     <table>
         <tr>
             <th>No.</th>
@@ -27,14 +29,15 @@
             <th>Remark</th>
         </tr>
 
+        {% set count = [1] %}
         {% for i in cursor %}
         <tr>
-            <td> {{ count }} </td>
+            <td> {{ count|length }} </td>
             <td> {{ i['username'] }} </td>
             <td> {{ i['datetime'] }} </td>
             <td> {{ i['remark'] }} </td>
         </tr>
-        {% set count = count + 1 %}
+        {{ count.append(1) }}
         {% endfor %}
 
     </table>
