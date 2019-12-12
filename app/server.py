@@ -139,7 +139,7 @@ def send():
 
         mongo.db.users.update_one(
             {'username': recipient},
-            {'$addToSet': {'files': {'filename': doc_name, 'sender': session['username'], 'status': 0, 'datetime': datetime.datetime.now()}
+            {'$addToSet': {'files': {'filename': doc_name, 'sender': session['username'], 'docType': docType, 'status': 0, 'datetime': datetime.datetime.now()}
                            }
              }
         )
@@ -248,6 +248,10 @@ def forward():
             error = f"There is no user {recipient}"
             return render_template('forward.html', user=session['username'], error=error)
 
+        if (mongo.db.files.find_one({'filename': filename})):
+            docType = mongo.db.files.find_one(
+                {'filename': filename})['docType']
+
         mongo.db.files.update_one(
             {'filename': filename},
             {'$addToSet':
@@ -259,7 +263,7 @@ def forward():
 
         mongo.db.users.update_one(
             {'username': recipient},
-            {'$addToSet': {'files': {'filename': filename, 'sender': session['username'], 'status': 0, 'datetime': datetime.datetime.now()}
+            {'$addToSet': {'files': {'filename': filename, 'sender': session['username'], 'docType': docType, 'status': 0, 'datetime': datetime.datetime.now()}
                            }
              }
         )
