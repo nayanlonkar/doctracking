@@ -160,6 +160,9 @@ def received():
     if request.method == 'POST':
         # option = int(request.form['options'])
         option = request.form.get('options')
+        docType = request.form.get('docType')
+
+        return f"{docType}"
         if (option == None):
             return "select an option!"
         else:

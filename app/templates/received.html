@@ -3,9 +3,17 @@
 <div class="receivedTab">
     <div class="form">
         <form action="{{ url_for('received') }}" method="post">
-            <input type="radio" name="options" value="1">Check For New Documents &nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="radio" name="options" value="2">Check All Received Documents
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <p>
+                <input type="radio" name="options" value="1">Check For New Documents &nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="radio" name="options" value="2">Check All Received Documents
+            </p>
+            <p>
+                <select name="docType">
+                    <option value="all">All</option>
+                    <option value="notice">Notice</option>
+                    <option value="request">Request</option>
+                </select>
+            </p>
             <input type="submit" value="Submit">
         </form>
     </div>
