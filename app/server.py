@@ -162,7 +162,6 @@ def received():
         option = request.form.get('options')
         docType = request.form.get('docType')
 
-        return f"{docType}"
         if (option == None):
             return "select an option!"
         else:
@@ -184,7 +183,7 @@ def received():
             error = "No file found"
             return render_template('received.html', user=session['username'], error=error, mongo=mongo)
 
-        return render_template('received.html', user=session['username'], option=option, cursor=cursor, mongo=mongo)
+        return render_template('received.html', user=session['username'], option=option, cursor=cursor, mongo=mongo, docType=docType)
     else:
         return render_template('received.html', user=session['username'])
 

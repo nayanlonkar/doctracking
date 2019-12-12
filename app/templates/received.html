@@ -36,6 +36,9 @@
                 <th>Description</th>
                 <th>Status</th>
             </tr>
+
+            {% if docType == 'all' %}
+
             {% set count = [1] %}
             {% for i in cursor%}
             {% if (i['status'] == 0) %}
@@ -55,6 +58,31 @@
             {{ count.append(1) }}
             {% endif %}
             {% endfor %}
+
+            {% else %}
+
+            {% set count = [1] %}
+            {% for i in cursor%}
+            {% if (i['status'] == 0 and i['docType'] == docType) %}
+            <tr>
+                <td> {{ count|length }} </td>
+                <td> {{ i['filename'] }} </td>
+                <td> {{ i['sender'] }} </td>
+                <td> {{ i['docType'] }} </td>
+                <td> {{ i['datetime'] }} </td>
+                <td>{{ mongo.db.files.find_one({'filename': i['filename'] })['description'] }}</td>
+                <td>
+                    <a href="{{ url_for('changeStatus', filename = i['filename']) }}">
+                        <button>Receive File</button>
+                    </a>
+                </td>
+            </tr>
+            {{ count.append(1) }}
+            {% endif %}
+            {% endfor %}
+
+            {% endif %}
+
         </table>
     </div>
 
@@ -72,6 +100,8 @@
                 <th>Description</th>
                 <th>Status</th>
             </tr>
+
+            {% if docType == 'all' %}
 
             {% set count = [1] %}
             {% for i in cursor%}
@@ -92,6 +122,32 @@
             {{ count.append(1) }}
             {% endif %}
             {% endfor %}
+
+            {% else %}
+
+            {% set count = [1] %}
+            {% for i in cursor%}
+            {% if (i['status'] == 1 and i['docType']==docType) %}
+            <tr>
+                <td> {{ count|length }} </td>
+                <td> {{ i['filename'] }} </td>
+                <td> {{ i['sender'] }} </td>
+                <td> {{ i['docType'] }} </td>
+                <td> {{ i['datetime'] }} </td>
+                <td>{{ mongo.db.files.find_one({'filename': i['filename'] })['description'] }}</td>
+                <td>
+                    <a href="{{ url_for('download', filename = i['filename']) }}">
+                        <button>Download File</button>
+                    </a>
+                </td>
+            </tr>
+            {{ count.append(1) }}
+            {% endif %}
+            {% endfor %}
+
+            {% endif %}
+
+
         </table>
     </div>
 
